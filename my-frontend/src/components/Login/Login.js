@@ -9,7 +9,7 @@ function Login(){
     })
 
     const navigate = useNavigate()
-
+    const [errorMessage, setErrorMessage] = useState('')
     const handleChange = (e) => {
         const {name, value} = e.target
         setFormData({
@@ -29,16 +29,22 @@ function Login(){
         .then((response) =>{
             console.log(response)
             if(response.status === 200){
-                navigate("/Chat")
+                navigate("/Chat", {state: {username: data.username}})
             }
             
         }).catch((err)=>{
-            console.log(err)
+            console.log('Login error', err)
+            if(err.response){
+                setErrorMessage(err.response.data.message)
+            }else{
+                setErrorMessage('An unexpected error occurred')
+            }
         })
     }
     return(
         <div>
             <h2>Login</h2>
+            {errorMessage && <p>{errorMessage}</p>}
             <div>
                 <form onSubmit={handleSubmit}>
 

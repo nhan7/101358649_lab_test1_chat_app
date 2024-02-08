@@ -28,14 +28,33 @@ router.post('/signup', (req,res) =>{
 
 
 
-router.post('/login', (req,res) =>{
-    const user = {
-        username: req.body.username,
-        password: req.body.password
-    }
+router.post('/login', async (req,res) =>{
+    // const user = {
+    //     username: req.body.username,
+    //     password: req.body.password
+    // }
+    const {username, password} = req.body
 
-    req.session.user = user;
-    res.send('Login successful!')
+    try{
+        const user = await User.findOne({username})
+
+        if(!user){
+            return res.status(401).json({message: "username or password is incorrect"})
+        }
+
+        const isPasswordValid = await User.findOne({password})
+        if(!isPasswordValid){
+            return res.status(401).json({message:"password is incorrect"})
+        }
+        req.session.user = user;
+        res.send('Login successful!')
+    }catch(error){
+        console.error("Login error:", error)
+        res.status(500).json({message:"An error has occurred"})
+    }
+    
+
+
 })
 
 module.exports = router
